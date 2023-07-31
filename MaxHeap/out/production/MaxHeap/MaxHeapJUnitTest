@@ -1,0 +1,428 @@
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+
+import org.junit.Before;
+import org.junit.Test;
+
+import java.util.ArrayList;
+
+public class MaxHeapJUnitTest {
+
+    private static final int TIMEOUT = 200;
+    private MaxHeap<Integer> heap;
+
+    @Before
+    public void setup() {heap = new MaxHeap(); }
+
+    @Test(timeout = TIMEOUT)
+    public void testBuildHeap() {
+        /*
+                 1
+             /       \
+            4         6
+           /  \      /  \
+          8    3     5   2
+         / \  / \   /
+       19 12 17 15 13
+            ->
+                 19
+             /       \
+            17        13
+           /  \      /  \
+          12   15    6   2
+         / \  / \   /
+        8  4  3  1 5
+        */
+
+        ArrayList<Integer> data = new ArrayList<>();
+        data.add(1);
+        data.add(4);
+        data.add(6);
+        data.add(8);
+        data.add(3);
+        data.add(5);
+        data.add(2);
+        data.add(19);
+        data.add(12);
+        data.add(17);
+        data.add(15);
+        data.add(13);
+        heap = new MaxHeap<>(data);
+
+        assertEquals(12, heap.size());
+
+        Integer[] expected = new Integer[25];
+        expected[1] = 19;
+        expected[2] = 17;
+        expected[3] = 13;
+        expected[4] = 12;
+        expected[5] = 15;
+        expected[6] = 6;
+        expected[7] = 2;
+        expected[8] = 8;
+        expected[9] = 4;
+        expected[10] = 3;
+        expected[11] = 1;
+        expected[12] = 5;
+        assertArrayEquals(expected, heap.getBackingArray());
+    }
+
+    @Test(timeout = TIMEOUT)
+    public void testAdd() {
+        /*
+                 7
+        */
+        heap.add(7);
+
+        /*
+                 7
+               /
+              6
+        */
+        heap.add(6);
+
+        /*
+                 7
+               /   \
+              6     2
+        */
+        heap.add(2);
+
+        /*
+                 7
+               /   \
+              6     2
+             /
+            1
+        */
+        heap.add(1);
+
+        /*
+                 7
+               /   \
+              6     2
+             / \
+            1   3
+        */
+        heap.add(3);
+
+        /*
+                 15
+               /    \
+              6      7
+             / \    /
+            1   3  2
+        */
+        heap.add(15);
+
+        /*
+                 15
+               /    \
+              6      7
+             / \    / \
+            1   3  2   5
+        */
+        heap.add(5);
+
+        /*
+                 21
+               /    \
+             15      7
+             / \    / \
+            6   3  2   5
+           /
+          1
+        */
+        heap.add(21);
+
+        /*
+                 21
+               /    \
+             15      7
+             / \    / \
+            6   3  2   5
+           / \
+          1  -1
+        */
+        heap.add(-1);
+
+        /*
+                  21
+               /     \
+             15       7
+           /   \     / \
+          6     3   2   5
+         / \   /
+        1  -1 0
+        */
+        heap.add(0);
+
+        /*
+                  21
+               /      \
+             19        7
+           /   \      / \
+          6    15    2   5
+         / \   / \
+        1  -1 0   3
+        */
+        heap.add(19);
+
+        /*
+                   35
+              /          \
+             19          21
+           /   \         / \
+          6    15       7   5
+         / \   / \     /
+        1  -1 0   3   2
+        */
+        heap.add(35);
+
+        /*
+                   35
+              /          \
+             19          29
+           /   \         / \
+          6    15       21  5
+         / \   / \     / \
+        1  -1 0   3   2   7
+        */
+        heap.add(29);
+
+        /*
+                   35
+              /          \
+             19           29
+           /   \         /   \
+          6    15       21    16
+         / \   / \     / \   /
+        1  -1 0   3   2   7 5
+        */
+        heap.add(16);
+
+        /*
+                   35
+              /          \
+             19           29
+           /   \         /   \
+          6    15       21    16
+         / \   / \     / \   /  \
+        1  -1 0   3   2   7 5    9
+        */
+        heap.add(9);
+
+        assertEquals(15, heap.size());
+
+        Integer[] expected = new Integer[MaxHeap.INITIAL_CAPACITY * 2];
+        expected[1] = 35;
+        expected[2] = 19;
+        expected[3] = 29;
+        expected[4] = 6;
+        expected[5] = 15;
+        expected[6] = 21;
+        expected[7] = 16;
+        expected[8] = 1;
+        expected[9] = -1;
+        expected[10] = 0;
+        expected[11] = 3;
+        expected[12] = 2;
+        expected[13] = 7;
+        expected[14] = 5;
+        expected[15] = 9;
+        assertArrayEquals(expected, heap.getBackingArray());
+    }
+
+    @Test(timeout = TIMEOUT)
+    public void testRemove() {
+        /*
+                   35
+              /          \
+             19           29
+           /   \         /   \
+          6    15       21    16
+         / \   / \     / \   /  \
+        1  -1 0   3   2   7 5    9
+        */
+        heap.add(35);
+        heap.add(19);
+        heap.add(29);
+        heap.add(6);
+        heap.add(15);
+        heap.add(21);
+        heap.add(16);
+        heap.add(1);
+        heap.add(-1);
+        heap.add(0);
+        heap.add(3);
+        heap.add(2);
+        heap.add(7);
+        heap.add(5);
+        heap.add(9);
+        assertEquals(15, heap.size());
+
+
+        assertEquals((Integer) 35, heap.remove());
+        assertEquals((Integer) 29, heap.remove());
+        assertEquals(13, heap.size());
+
+        /*
+                   21
+              /          \
+             19           16
+           /   \         /   \
+          6    15       9    5
+         / \   / \     / \
+        1  -1 0   3   2   7
+        */
+        Integer[] expected = new Integer[MaxHeap.INITIAL_CAPACITY * 2];
+        expected[1] = 21;
+        expected[2] = 19;
+        expected[3] = 16;
+        expected[4] = 6;
+        expected[5] = 15;
+        expected[6] = 9;
+        expected[7] = 5;
+        expected[8] = 1;
+        expected[9] = -1;
+        expected[10] = 0;
+        expected[11] = 3;
+        expected[12] = 2;
+        expected[13] = 7;
+        assertArrayEquals(expected, heap.getBackingArray());
+
+        assertEquals((Integer) 21, heap.remove());
+        assertEquals((Integer) 19, heap.remove());
+        assertEquals((Integer) 16, heap.remove());
+        assertEquals((Integer) 15, heap.remove());
+        assertEquals((Integer) 9, heap.remove());
+        assertEquals((Integer) 7, heap.remove());
+        assertEquals((Integer) 6, heap.remove());
+        assertEquals((Integer) 5, heap.remove());
+        assertEquals((Integer) 3, heap.remove());
+        assertEquals((Integer) 2, heap.remove());
+        assertEquals((Integer) 1, heap.remove());
+        assertEquals((Integer) 0, heap.remove());
+
+        assertEquals(1, heap.size());
+        Integer[] expected2 = new Integer[MaxHeap.INITIAL_CAPACITY * 2];
+        expected2[1] = -1;
+        assertArrayEquals(expected2, heap.getBackingArray());
+    }
+
+    @Test(timeout = TIMEOUT)
+    public void testGetMax() {
+        /*
+                   35
+              /          \
+             19           29
+           /   \         /   \
+          6    15       21    16
+         / \   / \     / \   /  \
+        1  -1 0   3   2   7 5    9
+        */
+        heap.add(35);
+        heap.add(19);
+        heap.add(29);
+        heap.add(6);
+        heap.add(15);
+        heap.add(21);
+        heap.add(16);
+        heap.add(1);
+        heap.add(-1);
+        heap.add(0);
+        heap.add(3);
+        heap.add(2);
+        heap.add(7);
+        heap.add(5);
+        heap.add(9);
+        assertEquals(15, heap.size());
+
+        assertSame(35, heap.getMax());
+
+        heap.remove();
+        assertSame(29, heap.getMax());
+
+        heap.remove();
+        assertSame(21, heap.getMax());
+
+        heap.remove();
+        assertSame(19, heap.getMax());
+
+        heap.remove();
+        assertSame(16, heap.getMax());
+    }
+
+    @Test(timeout = TIMEOUT)
+    public void testIsEmpty() {
+        assertTrue(heap.isEmpty());
+
+        /*
+                 35
+               /   \
+              19    29
+             / \
+            6   15
+         */
+
+        heap.add(35);
+        heap.add(19);
+        heap.add(29);
+        heap.add(6);
+        heap.add(15);
+        assertEquals(5, heap.size());
+
+        assertFalse(heap.isEmpty());
+
+        heap.remove();
+        heap.remove();
+        heap.remove();
+        heap.remove();
+        heap.remove();
+
+        assertEquals(0, heap.size());
+        assertTrue(heap.isEmpty());
+
+
+    }
+
+    @Test(timeout = TIMEOUT)
+    public void testClear() {
+        /*
+                   35
+              /          \
+             19           29
+           /   \         /   \
+          6    15       21    16
+         / \   / \     / \   /  \
+        1  -1 0   3   2   7 5    9
+        */
+        heap.add(35);
+        heap.add(19);
+        heap.add(29);
+        heap.add(6);
+        heap.add(15);
+        heap.add(21);
+        heap.add(16);
+        heap.add(1);
+        heap.add(-1);
+        heap.add(0);
+        heap.add(3);
+        heap.add(2);
+        heap.add(7);
+        heap.add(5);
+        heap.add(9);
+        assertEquals(15, heap.size());
+
+        heap.clear();
+
+        assertTrue(heap.isEmpty());
+        assertEquals(0, heap.size());
+        assertArrayEquals(new Comparable[MaxHeap.INITIAL_CAPACITY],
+                heap.getBackingArray());
+    }
+
+}
